@@ -1,0 +1,53 @@
+{
+  "appName": "RevoTime",
+  "login": "Login",
+  "welcome": "Welcome",
+  "loginSubtitle": "Please login to continue",
+  "email": "Email",
+  "emailHint": "example@email.com",
+  "emailRequired": "Please enter your email address",
+  "emailInvalid": "Please enter a valid email address",
+  "loginError": "Login failed. Please try again.",
+  "generalError": "An error occurred. Please try again.",
+  
+  "codeVerificationTitle": "Verify Code",
+  "enterCode": "Please enter the code",
+  "codeSentTo": "We sent a 6-digit code to {email}.",
+  "@codeSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "verify": "Verify",
+  "resendCode": "Resend Code",
+  "codeResentMessage": "Code resent successfully.",
+
+  "reminderGroups": "Reminder Groups",
+  "payments": "Payments",
+  "events": "Events",
+  "work": "Work",
+  "personal": "Personal",
+  "health": "Health",
+  "education": "Education",
+  "shopping": "Shopping",
+  "social": "Social",
+  "reminderCount": "{count} reminders",
+  "@reminderCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "upcomingReminders": "Upcoming Reminders",
+  "pastReminders": "Past Reminders",
+  "upcoming": "Upcoming",
+  "past": "Past",
+  "addReminder": "Add Reminder",
+  "rentPayment": "Rent Payment",
+  "doctorAppointment": "Doctor Appointment",
+  "meeting": "Meeting"
+} 

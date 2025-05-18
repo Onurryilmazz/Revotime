@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/widgets/app_header.dart';
 import '../../auth/services/auth_service.dart';
+import '../../reminders/view/reminder_group_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -64,9 +66,11 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       appBar: AppHeader(
-        title: 'RevoTime',
+        title: l10n.appName,
         showBackButton: false,
         actions: [
           IconButton(
@@ -114,12 +118,20 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                               },
                               child: _buildReminderCard(
                                 context,
-                                title: _getCardTitle(i),
-                                subtitle: _getCardSubtitle(i),
+                                title: _getCardTitle(i, l10n),
+                                subtitle: _getCardSubtitle(i, l10n),
                                 icon: _getCardIcon(i),
                                 color: _getCardColor(i),
                                 onTap: () {
-                                  // TODO: Navigate to respective page
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ReminderGroupView(
+                                        title: _getCardTitle(i, l10n),
+                                        groupId: i.toString(),
+                                      ),
+                                    ),
+                                  );
                                 },
                               ),
                             ),
@@ -129,7 +141,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                   ),
                 ),
                 const SizedBox(height: 16),
-                _buildUpcomingRemindersCard(context),
+                _buildUpcomingRemindersCard(context, l10n),
               ],
             ),
           ),
@@ -138,7 +150,72 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildUpcomingRemindersCard(BuildContext context) {
+  String _getCardTitle(int index, AppLocalizations l10n) {
+    switch (index) {
+      case 0:
+        return l10n.payments;
+      case 1:
+        return l10n.events;
+      case 2:
+        return l10n.work;
+      case 3:
+        return l10n.personal;
+      case 4:
+        return l10n.health;
+      case 5:
+        return l10n.education;
+      case 6:
+        return l10n.shopping;
+      case 7:
+        return l10n.social;
+      default:
+        return '';
+    }
+  }
+
+  String _getCardSubtitle(int index, AppLocalizations l10n) {
+    final counts = [5, 3, 7, 4, 2, 6, 3, 5];
+    return l10n.reminderCount(counts[index]);
+  }
+
+  IconData _getCardIcon(int index) {
+    switch (index) {
+      case 0:
+        return Icons.payment;
+      case 1:
+        return Icons.event;
+      case 2:
+        return Icons.work;
+      case 3:
+        return Icons.person;
+      case 4:
+        return Icons.health_and_safety;
+      case 5:
+        return Icons.school;
+      case 6:
+        return Icons.shopping_cart;
+      case 7:
+        return Icons.people;
+      default:
+        return Icons.error;
+    }
+  }
+
+  Color _getCardColor(int index) {
+    final colors = [
+      const Color(0xFF7FB1ED),
+      const Color(0xFF9CC2F0),
+      const Color(0xFFB5D4F5),
+      const Color(0xFF7FB1ED),
+      const Color(0xFF9CC2F0),
+      const Color(0xFFB5D4F5),
+      const Color(0xFF7FB1ED),
+      const Color(0xFF9CC2F0),
+    ];
+    return colors[index % colors.length];
+  }
+
+  Widget _buildUpcomingRemindersCard(BuildContext context, AppLocalizations l10n) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -168,7 +245,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Yaklaşan Hatırlatıcılar',
+                  l10n.upcomingReminders,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: const Color(0xFF2C3E50),
                         fontWeight: FontWeight.bold,
@@ -195,21 +272,21 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                       _buildReminderItem(
                         context,
                         date: '23 Mart',
-                        title: 'Kira Ödemesi',
+                        title: l10n.rentPayment,
                         time: '14:00',
                       ),
                       const SizedBox(height: 12),
                       _buildReminderItem(
                         context,
                         date: '24 Mart',
-                        title: 'Doktor Randevusu',
+                        title: l10n.doctorAppointment,
                         time: '10:30',
                       ),
                       const SizedBox(height: 12),
                       _buildReminderItem(
                         context,
                         date: '25 Mart',
-                        title: 'Toplantı',
+                        title: l10n.meeting,
                         time: '15:00',
                       ),
                     ],
@@ -264,89 +341,6 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
         ),
       ],
     );
-  }
-
-  String _getCardTitle(int index) {
-    switch (index) {
-      case 0:
-        return 'Ödemeler';
-      case 1:
-        return 'Etkinlikler';
-      case 2:
-        return 'İş';
-      case 3:
-        return 'Kişisel';
-      case 4:
-        return 'Sağlık';
-      case 5:
-        return 'Eğitim';
-      case 6:
-        return 'Alışveriş';
-      case 7:
-        return 'Sosyal';
-      default:
-        return '';
-    }
-  }
-
-  String _getCardSubtitle(int index) {
-    switch (index) {
-      case 0:
-        return '5 hatırlatıcı';
-      case 1:
-        return '3 hatırlatıcı';
-      case 2:
-        return '7 hatırlatıcı';
-      case 3:
-        return '4 hatırlatıcı';
-      case 4:
-        return '2 hatırlatıcı';
-      case 5:
-        return '6 hatırlatıcı';
-      case 6:
-        return '3 hatırlatıcı';
-      case 7:
-        return '5 hatırlatıcı';
-      default:
-        return '';
-    }
-  }
-
-  IconData _getCardIcon(int index) {
-    switch (index) {
-      case 0:
-        return Icons.payment;
-      case 1:
-        return Icons.event;
-      case 2:
-        return Icons.work;
-      case 3:
-        return Icons.person;
-      case 4:
-        return Icons.health_and_safety;
-      case 5:
-        return Icons.school;
-      case 6:
-        return Icons.shopping_cart;
-      case 7:
-        return Icons.people;
-      default:
-        return Icons.error;
-    }
-  }
-
-  Color _getCardColor(int index) {
-    final colors = [
-      const Color(0xFF7FB1ED),
-      const Color(0xFF9CC2F0),
-      const Color(0xFFB5D4F5),
-      const Color(0xFF7FB1ED),
-      const Color(0xFF9CC2F0),
-      const Color(0xFFB5D4F5),
-      const Color(0xFF7FB1ED),
-      const Color(0xFF9CC2F0),
-    ];
-    return colors[index % colors.length];
   }
 
   Widget _buildReminderCard(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../services/auth_service.dart';
+import 'code_verification_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -34,38 +36,37 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-      
-      try {
-        final token = await _authService.login(_emailController.text);
-        
-        if (token != null && mounted) {
-          // Navigate to home page
-          Navigator.pushReplacementNamed(context, '/home');
-        } else if (mounted) {
-          // Show error
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Giriş başarısız. Lütfen tekrar deneyin.'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Bir hata oluştu. Lütfen tekrar deneyin.'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setState(() => _isLoading = false);
-        }
-      }
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate API call
+    final loginSuccess = await _authService.login(_emailController.text);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (loginSuccess != null && mounted) {
+      // Navigate to code verification screen on successful login
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CodeVerificationView(email: _emailController.text),
+        ),
+      );
+    } else {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.loginError),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 

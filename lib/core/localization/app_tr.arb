@@ -1,0 +1,53 @@
+{
+  "appName": "RevoTime",
+  "login": "Giriş Yap",
+  "welcome": "Hoş Geldiniz",
+  "loginSubtitle": "Devam etmek için giriş yapın",
+  "email": "Email",
+  "emailHint": "ornek@email.com",
+  "emailRequired": "Lütfen email adresinizi girin",
+  "emailInvalid": "Lütfen geçerli bir email adresi girin",
+  "loginError": "Giriş başarısız. Lütfen tekrar deneyin.",
+  "generalError": "Bir hata oluştu. Lütfen tekrar deneyin.",
+  
+  "codeVerificationTitle": "Kodu Doğrula",
+  "enterCode": "Lütfen kodu girin",
+  "codeSentTo": "{email} adresinize 6 haneli bir kod gönderdik.",
+  "@codeSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "verify": "Doğrula",
+  "resendCode": "Kodu Tekrar Gönder",
+  "codeResentMessage": "Kod başarıyla yeniden gönderildi.",
+
+  "reminderGroups": "Hatırlatıcı Grupları",
+  "payments": "Ödemeler",
+  "events": "Etkinlikler",
+  "work": "İş",
+  "personal": "Kişisel",
+  "health": "Sağlık",
+  "education": "Eğitim",
+  "shopping": "Alışveriş",
+  "social": "Sosyal",
+  "reminderCount": "{count} hatırlatıcı",
+  "@reminderCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "upcomingReminders": "Yaklaşan Hatırlatıcılar",
+  "pastReminders": "Geçmiş Hatırlatıcılar",
+  "upcoming": "Yaklaşan",
+  "past": "Geçmiş",
+  "addReminder": "Hatırlatıcı Ekle",
+  "rentPayment": "Kira Ödemesi",
+  "doctorAppointment": "Doktor Randevusu",
+  "meeting": "Toplantı"
+} 
