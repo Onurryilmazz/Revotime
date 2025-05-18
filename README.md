@@ -96,11 +96,4 @@ revotime/
 
 ```
 
-## ScreenShot
-
-<div style="display: flex; justify-content: space-around; align-items: center;">
-  <img src="https://github.com/user-attachments/assets/7da7523c-a862-49bb-a60e-aac5c5fa51d6" alt="Login Screen" width="300"/>
-  <img src="https://github.com/user-attachments/assets/9294b1c5-cbbd-40d2-879d-ba636365f190" alt="Home Screen" width="300"/>
-</div>
-
 
