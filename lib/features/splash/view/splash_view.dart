@@ -21,8 +21,8 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        // Animasyon tamamlandığında ana sayfaya yönlendir
-        Navigator.pushReplacementNamed(context, '/home');
+        // Animasyon tamamlandığında login sayfasına yönlendir
+        Navigator.pushReplacementNamed(context, '/login');
       }
     });
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'core/theme/app_theme.dart';
-import 'package:revotime/features/splash/view/splash_view.dart';
+import 'features/auth/view/login_view.dart';
+import 'features/home/view/home_view.dart';
+import 'features/splash/view/splash_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,24 +25,9 @@ class MyApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       home: const SplashView(),
       routes: {
-        '/home': (context) => const HomeView(), // Ana sayfa route'u
+        '/login': (context) => const LoginView(),
+        '/home': (context) => const HomeView(),
       },
-    );
-  }
-}
-
-class HomeView extends StatelessWidget {
-  const HomeView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('RevoTime'),
-      ),
-      body: const Center(
-        child: Text('Ana Sayfa'),
-      ),
     );
   }
 }
