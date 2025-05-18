@@ -92,17 +92,11 @@ revotime/
 ├── l10n.yaml       # Localization configuration
 ├── pubspec.yaml    # Project dependencies
 ├── README.md       # Project README
-└── ... other files
+└── ... other files![Simulator Screenshot - iPhone 16 Pro - 2025-05-19 at 01 17 24](https://github.com/user-attachments/assets/9a7dc36d-f610-4318-b373-0925517549c8)
+
 ```
 
-## Contributing
 
-(Placeholder - Add contributing guidelines if this is an open-source project)
+![Simulator Screenshot - iPhone 16 Pro - 2025-05-19 at 01 17 10](https://github.com/user-attachments/assets/7da7523c-a862-49bb-a60e-aac5c5fa51d6)
 
-## License
 
-(Placeholder - Add license information)
-
-## Contact
-
-(Placeholder - Add contact information)
