@@ -2,22 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/widgets/app_header.dart';
+import '../services/reminder_service.dart';
+import '../models/reminder.dart';
+import 'package:intl/intl.dart';
 
 class ReminderGroupView extends StatefulWidget {
   final String title;
   final String groupId;
 
-  const ReminderGroupView({
-    super.key,
-    required this.title,
-    required this.groupId,
-  });
+  const ReminderGroupView({Key? key, required this.title, required this.groupId}) : super(key: key);
 
   @override
   State<ReminderGroupView> createState() => _ReminderGroupViewState();
 }
 
 class _ReminderGroupViewState extends State<ReminderGroupView> with TickerProviderStateMixin {
+  final ReminderService _reminderService = ReminderService();
+  late Future<List<Reminder>> _remindersFuture;
+
+  final List<String> _selectedReminderIds = [];
+  bool _isMultiSelectionMode = false;
+
   late final AnimationController _animationController;
   late final TabController _tabController;
   bool _isUpcoming = true;
@@ -41,6 +46,71 @@ class _ReminderGroupViewState extends State<ReminderGroupView> with TickerProvid
         _isUpcoming = _tabController.index == 0;
       });
     });
+
+    _remindersFuture = _reminderService.getReminders(); // Assuming getReminders fetches for a group or all
+  }
+
+  void _refreshRemindersList() {
+    setState(() {
+      _remindersFuture = _reminderService.getReminders();
+    });
+  }
+
+  void _toggleSelectionMode() {
+    setState(() {
+      _isMultiSelectionMode = !_isMultiSelectionMode;
+      if (!_isMultiSelectionMode) {
+        _selectedReminderIds.clear(); // Clear selection when exiting mode
+      }
+    });
+  }
+
+  void _toggleReminderSelection(String reminderId) {
+    setState(() {
+      if (_selectedReminderIds.contains(reminderId)) {
+        _selectedReminderIds.remove(reminderId);
+      } else {
+        _selectedReminderIds.add(reminderId);
+      }
+      // Exit multi-selection if no items are selected
+      if (_selectedReminderIds.isEmpty) {
+        _isMultiSelectionMode = false;
+      }
+    });
+  }
+
+  void _markSelectedAsCompleted() async {
+    if (_selectedReminderIds.isNotEmpty) {
+      // Show a loading indicator or dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Marking selected reminders as completed...'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+
+      for (final reminderId in _selectedReminderIds) {
+        await _reminderService.toggleReminderCompletion(reminderId, isCompleted: true); // Ensure it's marked completed
+      }
+
+      setState(() {
+        _selectedReminderIds.clear();
+        _isMultiSelectionMode = false;
+      });
+
+      _refreshRemindersList(); // Refresh the list after updating
+
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Selected reminders marked as completed!'),
+        ),
+      );
+    }
+  }
+
+  void _navigateToCreateReminder() {
+    Navigator.pushNamed(context, '/create-reminder');
   }
 
   @override
@@ -113,159 +183,165 @@ class _ReminderGroupViewState extends State<ReminderGroupView> with TickerProvid
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // TODO: Navigate to add reminder
-        },
-        icon: const Icon(Icons.add),
-        label: Text(l10n.addReminder),
-      ),
+      floatingActionButton: _isMultiSelectionMode
+          ? FloatingActionButton.extended(
+              onPressed: _markSelectedAsCompleted,
+              label: Text('Mark ${_selectedReminderIds.length} Selected as Completed'),
+              icon: const Icon(Icons.check_circle_outline),
+              backgroundColor: Colors.green,
+            )
+          : FloatingActionButton(
+              onPressed: _navigateToCreateReminder,
+              tooltip: 'Create Reminder',
+              child: const Icon(Icons.add),
+            ),
     );
   }
 
   Widget _buildReminderList({required bool isUpcoming}) {
-    // TODO: Replace with actual data
-    final List<Map<String, dynamic>> reminders = [
-      {
-        'title': 'Kira Ödemesi',
-        'date': '23 Mart 2024',
-        'time': '14:00',
-        'description': 'Aylık kira ödemesi',
-        'isCompleted': false,
-      },
-      {
-        'title': 'Doktor Randevusu',
-        'date': '24 Mart 2024',
-        'time': '10:30',
-        'description': 'Kontrol randevusu',
-        'isCompleted': false,
-      },
-      {
-        'title': 'Toplantı',
-        'date': '25 Mart 2024',
-        'time': '15:00',
-        'description': 'Proje toplantısı',
-        'isCompleted': false,
-      },
-    ];
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: reminders.length,
-      itemBuilder: (context, index) {
-        final reminder = reminders[index];
-        return _buildReminderCard(
-          context,
-          title: reminder['title'] as String,
-          date: reminder['date'] as String,
-          time: reminder['time'] as String,
-          description: reminder['description'] as String,
-          isCompleted: reminder['isCompleted'] as bool,
-        );
-      },
-    );
-  }
-
-  Widget _buildReminderCard(
-    BuildContext context, {
-    required String title,
-    required String date,
-    required String time,
-    required String description,
-    required bool isCompleted,
-  }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: InkWell(
-        onTap: () {
-          // TODO: Navigate to reminder details
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                Theme.of(context).colorScheme.primary.withOpacity(0.2),
-              ],
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: const Color(0xFF2C3E50),
-                            fontWeight: FontWeight.bold,
+    return FutureBuilder<List<Reminder>>(
+      future: _remindersFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No reminders found.'));
+        } else {
+          final reminders = snapshot.data!;
+          // Filter for upcoming reminders if needed, currently shows all
+          return ListView.builder(
+            itemCount: reminders.length,
+            itemBuilder: (context, index) {
+              final reminder = reminders[index];
+              final isSelected = _selectedReminderIds.contains(reminder.id);
+              return GestureDetector(
+                onLongPress: () {
+                  if (!_isMultiSelectionMode) {
+                    _toggleSelectionMode();
+                    _toggleReminderSelection(reminder.id); // Select the item on long press
+                  } else {
+                    _toggleReminderSelection(reminder.id);
+                  }
+                },
+                onTap: () {
+                  if (_isMultiSelectionMode) {
+                    _toggleReminderSelection(reminder.id);
+                  } else {
+                    // Existing edit/view logic here if needed
+                  }
+                },
+                child: Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  color: isSelected ? Colors.blue.shade100 : Colors.white, // Highlight selected items
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        if (_isMultiSelectionMode) ...[
+                          Checkbox(
+                            value: isSelected,
+                            onChanged: (bool? value) {
+                              _toggleReminderSelection(reminder.id);
+                            },
                           ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      isCompleted ? Icons.check_circle : Icons.circle_outlined,
-                      color: isCompleted
-                          ? Theme.of(context).colorScheme.primary
-                          : const Color(0xFF2C3E50),
-                    ),
-                    onPressed: () {
-                      // TODO: Toggle completion status
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                description,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFF2C3E50).withOpacity(0.7),
-                    ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today,
-                    size: 16,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    date,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFF2C3E50),
+                          const SizedBox(width: 12),
+                        ] else ...[
+                          // Completion Icon (re-using existing logic)
+                          InkWell(
+                            onTap: () async {
+                              await _reminderService.toggleReminderCompletion(reminder.id);
+                              _refreshRemindersList();
+                            },
+                            child: Icon(
+                              reminder.isCompleted
+                                  ? Icons.check_circle
+                                  : Icons.radio_button_unchecked,
+                              color: reminder.isCompleted ? Colors.green : Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                        ],
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                reminder.title,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: reminder.isCompleted
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none,
+                                  color: reminder.isCompleted ? Colors.grey : Colors.black,
+                                ),
+                              ),
+                              if (reminder.description != null && reminder.description!.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4.0),
+                                  child: Text(
+                                    reminder.description!,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: reminder.isCompleted ? Colors.grey.shade500 : Colors.grey.shade700,
+                                      decoration: reminder.isCompleted
+                                          ? TextDecoration.lineThrough
+                                          : TextDecoration.none,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${DateFormat('MMM d, yyyy').format(reminder.dateTime)} at ${DateFormat('h:mm a').format(reminder.dateTime)}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: reminder.isCompleted ? Colors.grey.shade500 : Colors.grey,
+                                  decoration: reminder.isCompleted
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        if (!_isMultiSelectionMode) ...[
+                           // Options Menu (Edit/Delete) - re-using existing logic
+                           PopupMenuButton<String>(
+                             onSelected: (value) async {
+                               if (value == 'edit') {
+                                 // Navigate to edit screen - assuming a route for edit
+                                  // This needs to be updated to navigate to the CreateReminderView for editing
+                                  // The CreateReminderView needs to be adapted to handle an existing reminder
+                                  // Navigator.pushNamed(context, '/edit-reminder', arguments: reminder);
+                               } else if (value == 'delete') {
+                                 await _reminderService.deleteReminder(reminder.id);
+                                 _refreshRemindersList();
+                               }
+                             },
+                             itemBuilder: (BuildContext context) {
+                               return ['edit', 'delete'].map((choice) {
+                                 return PopupMenuItem<String>(
+                                   value: choice,
+                                   child: Text(choice == 'edit' ? 'Edit' : 'Delete'), // Localize these texts
+                                 );
+                               }).toList();
+                             },
+                           ),
+                        ],
+                      ],
+                    ),
                   ),
-                  const SizedBox(width: 16),
-                  Icon(
-                    Icons.access_time,
-                    size: 16,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    time,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFF2C3E50),
-                        ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+                ),
+              );
+            },
+          );
+        }
+      },
     );
   }
 } 

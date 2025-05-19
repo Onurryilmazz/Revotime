@@ -6,6 +6,8 @@ import 'features/home/view/home_view.dart';
 import 'core/localization/app_localizations.dart';
 import 'features/splash/view/splash_view.dart';
 import 'features/auth/view/code_verification_view.dart';
+import 'features/reminders/view/reminder_group_view.dart';
+import 'features/reminders/view/create_reminder_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,6 +39,8 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginView(),
         '/home': (context) => const HomeView(),
         '/verify-code': (context) => const CodeVerificationView(email: ''), // Add route for code verification
+        '/reminder-group': (context) => const ReminderGroupView(title: "Payments", groupId: "123"),
+        '/create-reminder': (context) => const CreateReminderView(),
       },
     );
   }
